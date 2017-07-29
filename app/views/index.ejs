@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='public/stylesheets/style.css' />
+
+  </head>
+  <body>
+    <h1><%= title %></h1>
+
+    <ng-view></ng-view>
+
+    <!-- Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-resource.min.js"></script>
+
+    <!-- Template -->
+    <script type="text/ng-template" id="/registration.html">
+
+        Team:<input type="text" ng-model="teamDetails.teamname"><br><br>
+        RollNumber1:<input type="text" ng-model="teamDetails.entry1">
+        Name1:<input type="text" ng-model="teamDetails.name1"><br>
+        RollNumber2:<input type="text" ng-model="teamDetails.entry2">
+        Name2:<input type="text" ng-model="teamDetails.name2"><br>
+        RollNumber3:<input type="text" ng-model="teamDetails.entry3">
+        Name3:<input type="text" ng-model="teamDetails.name3"><br>
+        <button class="button" ng-click='save()'>Register</button><br>
+        <a ng-model="registered">Registered: {{registered}}</a><br>
+        <a ng-model="myusers">MyUsers: {{myusers}}</a>
+    </script>
+
+
+
+    <script>
+      angular.module('app', ['ngRoute', 'ngResource'])
+
+        //---------------
+        // Services
+        //---------------
+
+        .factory('Users', ['$resource', function($resource){
+          return $resource('/api/users', null);
+        }])
+
+//http://adrianmejia.com/blog/2014/09/28/angularjs-tutorial-for-beginners-with-nodejs-expressjs-and-mongodb/
+        //---------------
+        // Controllers
+        //---------------
+
+        .controller('RegController', ['$scope', '$http','Users', function ($scope, $http,Users) {
+          //$scope.editing = [];
+          $scope.myusers = Users.get({});//.query() not work
+          $scope.teamDetails=$scope.teamDetails||{};
+          $scope.save = function(){
+            // var user = new Users({name:'Raaa',teamname:'Raaat',rollnumber:'279'});
+            // user.$save(function(){
+            //   $scope.myusers.push(user);
+            // });
+            $scope.registered='Invalid';
+
+            if(!$scope.teamDetails['teamname'] ||
+            $scope.teamDetails['teamname'].length<1 ||
+            !$scope.teamDetails['entry1'] ||
+            $scope.teamDetails['entry1'].length<1 ||
+            !$scope.teamDetails['entry2'] ||
+            $scope.teamDetails['entry2'].length<1 ||
+            !$scope.teamDetails['name1'] ||
+            $scope.teamDetails['name1'].length<1 ||
+            !$scope.teamDetails['name2'] ||
+            $scope.teamDetails['name2'].length<1){
+                  $scope.registered='Please enter valid data for first and second member or team name!!!'
+                  return;
+            }
+            if(
+              ($scope.teamDetails['entry3'] && $scope.teamDetails['entry3'].length>0)
+              && (!$scope.teamDetails['name3'] || $scope.teamDetails['name3'].length<1)
+            ){
+              $scope.registered='Please enter valid data for third member!!!'
+              return;
+            }
+            if(
+              ($scope.teamDetails['name3'] && $scope.teamDetails['name3'].length>0)
+              && (!$scope.teamDetails['entry3'] || $scope.teamDetails['entry3'].length<1)
+            ){
+              $scope.registered='Please enter valid data for third member!!!'
+              return;
+            }
+
+            $http({method: 'POST', url: '/api/register',data:$scope.teamDetails}).
+            success(function(res, status, headers, config) {
+              // this callback will be called asynchronously
+              // when the response is available.
+              if(res.RESPONSE_SUCCESS=='1'){
+                  $scope.registered=res.RESPONSE_MESSAGE
+                  $scope.teamDetails={}
+              }else{
+                  if(res.RESPONSE_MESSAGE=="User already registered"){
+                      $scope.registered='You cannot register twice!!!'
+                  }else{
+                      $scope.registered='Data Incorrect!!!'
+                  }
+
+              }
+            }).
+            error(function(res, status, headers, config) {
+              // called asynchronously if an error occurs
+              // or server returns response with an error status.
+              $scope.registered=res
+              //console.log('Oops and error', data);
+            });
+
+          }
+
+
+        }])
+
+        .config(['$routeProvider', function ($routeProvider) {
+          $routeProvider
+            .when('/', {
+              templateUrl: '/registration.html',
+              controller: 'RegController'
+            })
+        }]);
+    </script>
+  </body>
+</html>

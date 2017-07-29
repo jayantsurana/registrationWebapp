@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html ng-app="app">
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+
+    <ng-view></ng-view>
+
+    <!-- Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular-resource.min.js"></script>
+
+    <!-- Template -->
+    <script type="text/ng-template" id="/registration.html">
+    <form method="post" action="/api/register">
+        Team:<input type="text" name="teamname"><br><br>
+        RollNumber1:<input type="text" name="entry1">
+        Name1:<input type="text" name="name1"><br>
+        RollNumber2:<input type="text" name="entry2">
+        Name2:<input type="text" name="name2"><br>
+        RollNumber3:<input type="text" name="entry3">
+        Name3:<input type="text" name="name3"><br>
+        <input type="submit">
+    </form>
+
+    </script>
+
+
+
+    <script>
+      angular.module('app', ['ngRoute', 'ngResource'])
+
+        //---------------
+        // Services
+        //---------------
+
+        .factory('Users', ['$resource', function($resource){
+          return $resource('/register', null, {
+            //'update': { method:'PUT' }
+          });
+        }])
+
+        //---------------
+        // Controllers
+        //---------------
+
+        //.controller('RegController', ['$scope', 'Users', function ($scope, Users) {
+          //$scope.editing = [];
+          //$scope.users = Users.query();
+
+          // $scope.save = function(){
+          //   if(!$scope.roll1 || $scope.roll1.length < 1 ||
+          //       !$scope.roll2 || $scope.roll2.length < 1 ||
+          //       !$scope.name1 || $scope.name1.length < 1 ||
+          //       !$scope.name2 || $scope.name2.length < 1
+          //   ) return;
+          //   //var todo = new Todos({ name: $scope.newTodo, completed: false });
+          //   $location.url('/api/register');
+          //   //var todo = new Todos({ name: $scope.newTodo, completed: false });
+          //
+          //   // todo.$save(function(){
+          //   //   //$scope.todos.push(todo);
+          //   //   //$scope.newTodo = ''; // clear textbox
+          //   // });
+          // }
+
+          // $scope.update = function(index){
+          //   //console.log('Kya hua bhai');
+          //   var todo = $scope.todos[index];
+          //   Todos.update({id: todo._id}, todo);
+          //   $scope.editing[index] = false;
+          // }
+          //
+          // $scope.edit = function(index){
+          //   $scope.editing[index] = angular.copy($scope.todos[index]);
+          // }
+
+          // $scope.cancel = function(index){
+          //
+          //   $scope.todos[index] = angular.copy($scope.editing[index]);
+          //
+          //   $scope.editing[index] = false;
+          // }
+
+          // $scope.remove = function(index){
+          //   var todo = $scope.todos[index];
+          //   Todos.remove({id: todo._id}, function(){
+          //     $scope.todos.splice(index, 1);
+          //   });
+          // }
+        //}])
+
+        // .controller('TodoDetailCtrl', ['$scope', '$routeParams', 'Todos', '$location', function ($scope, $routeParams, Todos, $location) {
+        //   $scope.todo = Todos.get({id: $routeParams.id });
+        //
+        //   $scope.remove = function(){
+        //     Todos.remove({id: $scope.todo._id}, function(){
+        //       $location.url('/');
+        //     });
+        //   }
+        //   $scope.updateCN = function(){
+        //     Todos.update({id: $scope.todo._id}, $scope.todo, function(){
+        //       $location.url('/');
+        //     });
+        //   }
+        // }])
+
+        //---------------
+        // Routes
+        //---------------
+
+        .config(['$routeProvider', function ($routeProvider) {
+          $routeProvider
+            .when('/', {
+              templateUrl: '/registration.html',
+              //controller: 'RegController'
+            })
+        }]);
+    </script>
+  </body>
+</html>
